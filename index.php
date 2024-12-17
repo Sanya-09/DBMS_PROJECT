@@ -1,3 +1,35 @@
+<?php 
+include('includes/connect.php');
+session_start();
+
+if(isset($_POST['login'])){
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+
+    // Prevent SQL Injection
+    $username = mysqli_real_escape_string($con, $username);
+    $password = mysqli_real_escape_string($con, $password);
+
+    // Query to check the credentials
+    $query = "SELECT * FROM users WHERE username='$username'";
+    $result = mysqli_query($con, $query);
+
+    if($result && mysqli_num_rows($result) > 0){
+        $row = mysqli_fetch_assoc($result);
+
+        // Verify password
+        if(password_verify($password, $row['password'])){
+            $_SESSION['username'] = $username; // Store session
+            header('Location: dashboard.php'); // Redirect to a new page
+            exit();
+        } else {
+            $error_message = "Invalid username or password.";
+        }
+    } else {
+        $error_message = "User not found.";
+    }
+}
+?>
 <!-- connect files -->
 <?php 
 include('includes/connect.php');
@@ -31,13 +63,13 @@ include('functions/common_function.php');
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="#">Home</a>
+          <a class="nav-link active" aria-current="page" href="index.php">Home</a>
          </li>
          <li class="nav-item">
-          <a class="nav-link" href="#">Products</a>
+          <a class="nav-link" href="display_all.php">Products</a>
          </li>
          <li class="nav-item">
-          <a class="nav-link" href="#">Register</a>
+          <a class="nav-link" href="register.php">Register</a>
          </li>
          <li class="nav-item">
           <a class="nav-link" href="#">Contact</a>
@@ -46,12 +78,13 @@ include('functions/common_function.php');
           <a class="nav-link" href="#"><i class="fa-solid fa-cart-shopping"></i><sup>1</sup></a>
          </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Total Price:</a>
+          <a class="nav-link" href="#">Total Price: 100/-</a>
          </li>
         
-          <form class="d-flex" role="search">
-          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-         <button class="btn btn-outline-light" type="submit">Search</button>
+          <form class="d-flex" >
+          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="search_data">
+         <!-- <button class="btn btn-outline-light" type="submit">Search</button> -->
+          <input type="submit" value="Search" class="btn btn-outline-dark" name="search_data_product">
          </form>
          </div>
          </div>
@@ -64,7 +97,7 @@ include('functions/common_function.php');
           <a class="nav-link" href="#">Welcome Guest</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Login</a>
+          <a class="nav-link" href="login.php">Login</a>
         </li>
         </ul>
      </nav>
@@ -116,8 +149,10 @@ include('functions/common_function.php');
 </div>  
 </div>
     <!-- last child -->
-    <div class="bg-info p-3 text-center"></div>
-    <p>All rights reserved- Designed by Sanya Agarwal </p>
+    <?php
+        include("./includes/footer.php")
+    ?>
+
     </div>
 
  
